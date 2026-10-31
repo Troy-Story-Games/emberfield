@@ -58,6 +58,8 @@ var _hint: Label
 var _about_box: VBoxContainer
 var _reduce_flashing_check: CheckBox
 var _gate: Control
+var _gate_center: CenterContainer
+var _gate_card: PanelContainer
 var _gate_question: Label
 var _gate_answer: LineEdit
 var _gate_note: Label
@@ -474,17 +476,15 @@ func _build_grown_up_gate() -> void:
     dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
     _gate.add_child(dim)
-    # Upper half of the screen, so the number keyboard doesn't cover it.
-    var center := CenterContainer.new()
-    center.anchor_right = 1.0
-    center.anchor_bottom = 0.5
-    center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    _gate.add_child(center)
+    # Upper half of the screen, so the number keyboard doesn't cover it. The container
+    # carries the UI scale, because a container resets its child's scale on layout.
+    _gate_center = CenterContainer.new()
+    _gate_center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _gate.add_child(_gate_center)
     var card := PanelContainer.new()
-    card.custom_minimum_size = Vector2(380, 0)
-    card.scale = Vector2(_ui_scale, _ui_scale)
-    card.resized.connect(func() -> void: card.pivot_offset = card.size * 0.5)
-    center.add_child(card)
+    _gate_card = card
+    _gate_center.add_child(card)
+    _layout_gate()
     var margin := MarginContainer.new()
     for side in ["left", "right", "top", "bottom"]:
         margin.add_theme_constant_override("margin_" + side, 20)
@@ -524,6 +524,17 @@ func _build_grown_up_gate() -> void:
     ok.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     ok.pressed.connect(_check_gate)
     buttons.add_child(ok)
+
+
+## Sizes the gate's upper-half area in unscaled units, then scales it to fill the screen.
+func _layout_gate() -> void:
+    if _gate_center == null:
+        return
+    var view := get_viewport().get_visible_rect().size
+    _gate_center.position = Vector2.ZERO
+    _gate_center.scale = Vector2(_ui_scale, _ui_scale)
+    _gate_center.size = Vector2(view.x, view.y * 0.5) / _ui_scale
+    _gate_card.custom_minimum_size = Vector2(minf(380.0, view.x / _ui_scale - 32.0), 0)
 
 
 ## Shows the gate and calls on_pass only after a correct answer.
@@ -1397,6 +1408,7 @@ func _apply_ui_scale_to_controls() -> void:
         panel_size = Vector2(520, 1080)
     panel.pivot_offset = panel_size * 0.5
     panel.scale = Vector2(_ui_scale, _ui_scale)
+    _layout_gate()
 
 
 func _fit_panel_to_window() -> void:

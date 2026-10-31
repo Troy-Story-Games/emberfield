@@ -204,6 +204,11 @@ func _ensure_bus() -> void:
 func _start_mic() -> void:
     if not _ensure_permission():
         return
+    # Restarting right away kills input: the old player closes the shared input device
+    # only once it's freed, after the new one has already tried to open it.
+    if _mic != null and _mic.playing:
+        status_text = "Listening"
+        return
     if AudioServer.get_input_device_list().is_empty():
         status_text = "Microphone unavailable"
         return
@@ -243,6 +248,7 @@ func _on_playback_status(text: String) -> void:
 
 func _ensure_permission() -> bool:
     if OS.get_name() != "Android" or _permission_granted():
+        _awaiting_permission = false
         return true
     OS.request_permission("android.permission.RECORD_AUDIO")
     _awaiting_permission = true

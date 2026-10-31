@@ -42,7 +42,7 @@ Free and open source (MIT), with no ads, no trackers, no accounts and no network
 
 ## Build from a fresh clone
 
-Playback capture is not checked in. Windows needs a GDExtension built from [`native/playback_capture`](native/playback_capture). Android needs an AAR built from [`android/plugins/playback_capture`](android/plugins/playback_capture). Microphone mode does not need either binary.
+For playback capture; Windows needs a GDExtension built from [`native/playback_capture`](native/playback_capture) and Android needs an AAR built from [`android/plugins/playback_capture`](android/plugins/playback_capture). Microphone mode does not need either binary.
 
 Install [Godot 4.7+](https://godotengine.org/download/), Python 3.8+, and [SCons](https://scons.org/). Windows playback also needs Visual Studio with the C++ desktop workload. The Android plugin needs JDK 17+ and Android SDK 34 or newer.
 
@@ -59,49 +59,32 @@ git submodule update --init
 
 ### Windows playback library
 
-From `native/playback_capture`, dump this editor's API next to the SConstruct, then build the editor and export libraries. `gdextension_dir` is the directory that contains `gdextension_interface.json`.
+From `native/playback_capture`, dump the Godot editor's API next to the SConstruct, then build the editor and export libraries. `gdextension_dir` is the directory that contains `gdextension_interface.json`.
 
 ```powershell
 cd native/playback_capture
+
+# or wherever you install the Godot binary
 & "$env:LOCALAPPDATA\Godot\Godot_v4.7.2-stable_win64_console.exe" --headless --dump-extension-api
 & "$env:LOCALAPPDATA\Godot\Godot_v4.7.2-stable_win64_console.exe" --headless --dump-gdextension-interface-json
 scons platform=windows target=template_debug arch=x86_64 gdextension_dir=. custom_api_file=extension_api.json
 scons platform=windows target=template_release arch=x86_64 gdextension_dir=. custom_api_file=extension_api.json
 ```
 
-That writes `bin/libplayback_capture.windows.template_debug.x86_64.dll` (editor) and `bin/libplayback_capture.windows.template_release.x86_64.dll` (export). godot-cpp is the `master` submodule. Its build tree stays inside the submodule and is not committed.
+That writes `bin/libplayback_capture.windows.template_debug.x86_64.dll` (editor) and `bin/libplayback_capture.windows.template_release.x86_64.dll` (export).
 
 ### Android playback library
 
 From `android/plugins/playback_capture`:
 
 ```powershell
+# or wherever you have java (JAVA_HOME may even already be set)
 $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.8.9-hotspot"
 $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
 .\gradlew.bat assembleRelease
 ```
 
 `assembleRelease` writes `bin/playback_capture.aar`. An Android export also runs that build when the AAR is missing, using the Android SDK and JDK paths from **Editor Settings → Export → Android**. Rebuild it after changing the plugin, then export again. Godot only creates the `PlaybackCapture` singleton when the AAR manifest contains `org.godotengine.plugin.v2.PlaybackCapture`.
-
-### Open in Godot
-
-1. Import this folder as a project (or open `project.godot`)
-2. Press Play (`F5`)
-
-```powershell
-& "$env:LOCALAPPDATA\Godot\Godot_v4.7.2-stable_win64.exe" --path .
-```
-
-## Export
-
-Presets are in [`export_presets.cfg`](export_presets.cfg). Keystore passwords are not in that file; Godot keeps them in `.godot/export_credentials.cfg`.
-
-| Preset | Output | Use |
-|--------|--------|-----|
-| Android | `export/Emberfield.apk` | GitHub releases, sideloading |
-| Android Play | `export/Emberfield.aab` | Google Play upload |
-| Windows Desktop | `export/Emberfield.exe` | |
-| Linux | `export/Emberfield.x86_64` | |
 
 ### Android
 
@@ -147,24 +130,6 @@ Scripts in [`tools/`](tools) are excluded from exports.
 | `godot --path . -s res://tools/screenshot.gd -- --out=<path> --mode=<n> [--panel]` | Scripted drag, then screenshots |
 | `godot --path . -s res://tools/audio_demo.gd -- --out=<path> --style=<n>` | Plays a synthetic track into the muted analyzer and screenshots an Audio style |
 | `python tools/make_icon.py`, then `godot --headless --path . -s res://tools/make_icons.gd` | Regenerates the icon SVGs and the Android and store PNGs |
-
-## Project layout
-
-```
-scenes/          Main, particle canvas, settings UI
-scripts/         Simulator, touch, auto-control, settings, UI theme
-scripts/art_modes/   Pulse, Vortex, Repel, Lightning, Flow, Black Hole, Sink, Beam, Orbit, Ripple, Magnet, Fluid, Fireworks, Audio
-scripts/audio/   Analyze bus, microphone, playback resample
-shaders/         Trail fade + invert composite
-native/playback_capture/   Windows WASAPI loopback (godot-cpp submodule on master)
-android/plugins/ PlaybackCapture Android plugin sources and Gradle wrapper
-addons/playback_capture/   Builds the AAR on Android export when it is missing
-icon/            App icon sources and generated Android icons
-fastlane/        Store listing text, icon, feature graphic, screenshots (Play and F-Droid)
-docs/            Tutorials, privacy policy, F-Droid recipe draft
-tools/           Benchmark, screenshot, audio demo and icon scripts (not exported)
-export/          Build output dir
-```
 
 ## License
 
