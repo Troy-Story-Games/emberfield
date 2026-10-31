@@ -1,0 +1,3 @@
+Bug fix.
+
+- The "Visualizing playback" notification now shows while Playback audio is on. On Android 13 and newer, Emberfield asks for notification permission first

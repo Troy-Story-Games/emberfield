@@ -1,7 +1,9 @@
 package com.troystorygames.emberfield.playback
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.view.View
@@ -48,8 +50,32 @@ class PlaybackCapturePlugin(godot: Godot) : GodotPlugin(godot) {
         }
         CaptureBridge.plugin = this
         CaptureBridge.status = "Waiting for capture"
+        // Android 13+ hides the foreground service notification without this permission.
+        if (Build.VERSION.SDK_INT >= 33 &&
+            host.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            host.requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_NOTIFICATIONS)
+            return
+        }
+        openCapturePrompt(host)
+    }
+
+    private fun openCapturePrompt(host: Activity) {
         val manager = host.getSystemService(Activity.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
         host.startActivityForResult(manager.createScreenCaptureIntent(), REQUEST_CAPTURE)
+    }
+
+    override fun onMainRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>?,
+        grantResults: IntArray?,
+    ) {
+        if (requestCode != REQUEST_NOTIFICATIONS) {
+            return
+        }
+        // Continue either way; capture still works if the user declines notifications.
+        val host = hostActivity ?: activity ?: return
+        openCapturePrompt(host)
     }
 
     @UsedByGodot
@@ -97,5 +123,6 @@ class PlaybackCapturePlugin(godot: Godot) : GodotPlugin(godot) {
 
     companion object {
         private const val REQUEST_CAPTURE = 0x5150
+        private const val REQUEST_NOTIFICATIONS = 0x5151
     }
 }
