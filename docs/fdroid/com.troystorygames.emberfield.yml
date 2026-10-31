@@ -1,0 +1,78 @@
+# Draft fdroiddata recipe for Emberfield. Copy to metadata/com.troystorygames.emberfield.yml
+# in a fork of https://gitlab.com/fdroid/fdroiddata and test with `fdroid build`.
+#
+# F-Droid builds everything from source, so this compiles the Godot 4.7.2 editor (to run
+# the export headless) and the Android export templates, then exports with the committed
+# "Android" preset. If fdroiddata has no `godot` srclib yet, add srclibs/godot.yml:
+#   RepoType: git
+#   Repo: https://github.com/godotengine/godot.git
+# Expect reviewers to suggest adjustments; Godot recipes vary between engine versions.
+
+Categories:
+  - Graphics
+  - Multimedia
+License: MIT
+AuthorName: Troy Story Games
+SourceCode: https://github.com/Troy-Story-Games/emberfield
+IssueTracker: https://github.com/Troy-Story-Games/emberfield/issues
+Changelog: https://github.com/Troy-Story-Games/emberfield/releases
+
+AutoName: Emberfield
+
+RepoType: git
+Repo: https://github.com/Troy-Story-Games/emberfield.git
+
+Builds:
+  - versionName: 1.0.0
+    versionCode: 1
+    commit: v1.0.0
+    submodules: false
+    sudo:
+      - apt-get update
+      - apt-get install -y scons pkg-config libx11-dev libxcursor-dev libxinerama-dev
+        libgl1-mesa-dev libglu1-mesa-dev libasound2-dev libpulse-dev libudev-dev
+        libxi-dev libxrandr-dev libwayland-dev
+    output: export/Emberfield.apk
+    srclibs:
+      - godot@4.7.2-stable
+    rm:
+      - android/plugins/playback_capture/gradle/wrapper/gradle-wrapper.jar
+      - native/playback_capture
+    prebuild:
+      # F-Droid signs the APK itself.
+      - sed -i -e 's/^package\/signed=true/package\/signed=false/' export_presets.cfg
+      - sed -i -e 's/^gradle_build\/export_format=1/gradle_build\/export_format=0/' export_presets.cfg
+    scandelete:
+      - .godot
+    build:
+      # 1. Headless-capable Linux editor, used only to run the export.
+      - pushd $$godot$$
+      - scons platform=linuxbsd target=editor production=yes -j$(nproc)
+      # 2. Android release templates and the Gradle build template source.
+      - scons platform=android target=template_release arch=arm32 production=yes -j$(nproc)
+      - scons platform=android target=template_release arch=arm64 production=yes generate_android_binaries=yes -j$(nproc)
+      - popd
+      - export GODOT=$$godot$$/bin/godot.linuxbsd.editor.x86_64
+      - export TEMPLATES=$HOME/.local/share/godot/export_templates/4.7.2.stable
+      - mkdir -p $TEMPLATES
+      - cp $$godot$$/bin/android_source.zip $TEMPLATES/
+      - cp $$godot$$/bin/android_release.apk $TEMPLATES/ || true
+      # 3. Point the editor at the build server's SDK and JDK.
+      - mkdir -p $HOME/.config/godot
+      - printf '[gd_resource type="EditorSettings" format=3]\n\n[resource]\nexport/android/android_sdk_path = "%s"\nexport/android/java_sdk_path = "%s"\n'
+        "$ANDROID_HOME" "$JAVA_HOME" > $HOME/.config/godot/editor_settings-4.7.tres
+      # 4. Playback-capture plugin AAR (Kotlin, compileOnly against godot-lib).
+      - pushd android/plugins/playback_capture
+      - gradle assembleRelease
+      - popd
+      # 5. Import, install the Gradle build template, export.
+      - $GODOT --headless --path . --import
+      - $GODOT --headless --path . --install-android-build-template
+      - mkdir -p export
+      - $GODOT --headless --path . --export-release Android export/Emberfield.apk
+    ndk: r28b
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^v[0-9.]+$
+CurrentVersion: 1.0.0
+CurrentVersionCode: 1

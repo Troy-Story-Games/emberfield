@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://ciw7ibvpko2rk"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/touch_input.gd" id="2_touch"]
+[ext_resource type="PackedScene" uid="uid://bqparticlecanvas1" path="res://scenes/particle_canvas.tscn" id="3_canvas"]
+[ext_resource type="PackedScene" uid="uid://bqsettingspanel01" path="res://scenes/settings_panel.tscn" id="4_settings"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_main")
+
+[node name="TouchInput" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_touch")
+
+[node name="ParticleSimulator" parent="." instance=ExtResource("3_canvas")]
+unique_name_in_owner = true
+
+[node name="SettingsPanel" parent="." instance=ExtResource("4_settings")]
+unique_name_in_owner = true

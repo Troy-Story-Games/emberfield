@@ -1,0 +1,8 @@
+First release.
+
+- 14 touch modes: Pulse, Vortex, Repel, Lightning, Flow, Black Hole, Sink, Beam, Orbit, Ripple, Magnet, Fluid, Fireworks and Audio
+- Audio visualizer for the microphone or music playing on your phone, with 8 styles including Galaxy
+- Touch instrument that plays notes as you draw
+- 10 color palettes, glow and adjustable trails
+- Made for all ages: Reduce flashing option and a grown-up check
+- No ads, no trackers, no accounts

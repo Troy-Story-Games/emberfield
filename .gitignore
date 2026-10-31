@@ -1,0 +1,53 @@
+# Created by https://www.toptal.com/developers/gitignore/api/godot
+# Edit at https://www.toptal.com/developers/gitignore?templates=godot
+
+### Godot ###
+# Godot 4+ specific ignores
+.godot/
+
+# Godot-specific ignores
+.import/
+export.cfg
+# export_presets.cfg is committed: Godot 4 keeps keystore passwords in .godot/export_credentials.cfg
+
+# Imported translations (automatically generated from CSV files)
+*.translation
+
+# Mono-specific ignores
+.mono/
+data_*/
+mono_crash.*.json
+
+# End of https://www.toptal.com/developers/gitignore/api/godot
+
+# temporary directory
+tmp/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# Playback-capture build outputs (rebuild from a fresh clone; see README)
+native/playback_capture/bin/
+native/playback_capture/extension_api.json
+native/playback_capture/gdextension_interface.h
+native/playback_capture/gdextension_interface.json
+native/playback_capture/.sconsign.dblite
+native/playback_capture/compile_commands.json
+native/playback_capture/**/*.obj
+native/playback_capture/**/*.obj.import
+native/playback_capture/**/*.os
+android/plugins/playback_capture/bin/
+android/plugins/playback_capture/.gradle/
+android/plugins/playback_capture/.kotlin/
+android/plugins/playback_capture/build/
+android/plugins/playback_capture/local.properties
+android/plugins/playback_capture/.gradle-dist/
+
+# Installed by Project → Install Android Build Template
+android/.build_version
+android/build/

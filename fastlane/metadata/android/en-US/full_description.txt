@@ -1,0 +1,35 @@
+Emberfield turns your screen into thousands of glowing particles that follow your fingers and move to your music.
+
+It's free and open source, and it stays that way. There are no ads, no trackers, no accounts, no in-app purchases and no internet permission.
+
+<b>Fourteen ways to play</b>
+• Pulse: tap for a shockwave, hold to stream particles from your fingertip
+• Vortex: particles spin in a tight whirl around your finger
+• Repel: push the swarm away
+• Lightning: charge up, then strike outward
+• Flow: drag to steer a current, or tilt your phone
+• Black Hole: swallow everything, then let go to explode
+• Fluid: drifting smoke you can stir with a finger
+• Fireworks: tap to launch bursts, hold to keep firing
+• Sink, Beam, Orbit, Ripple and Magnet
+• Audio: a music visualizer (see below)
+
+<b>Music visualizer</b>
+Point it at the room with the microphone, or visualize the music playing on your phone from your favorite player. Eight styles: Pulse, Equalizer, Vertical Equalizer, Circular Equalizer, Swirl, Waveform, Draw and Galaxy. Auto gain keeps it lively at any volume, and beat detection makes it flash and kick in time.
+
+<b>Make it yours</b>
+• Up to 12,000 particles
+• 10 color palettes, including Fire, Ocean, Neon, Aurora and Sparkle
+• Glow, trail length, particle size and invert
+• Reduce flashing option for sensitive eyes
+• Idle patterns: Drift, Swirl, Lattice, Boids and Rain
+• Auto mode for a hands-free screensaver
+• Touch instrument: play notes on a musical scale as you draw
+
+<b>Privacy</b>
+Audio is analyzed on your device and never recorded, stored or sent anywhere. The app has no network access at all. The microphone and playback capture only run while the Audio mode is on.
+
+<b>Made for all ages</b>
+Built for kids and grown-ups alike. Playback capture and the link to the source code sit behind a quick grown-up check.
+
+Source code: https://github.com/Troy-Story-Games/emberfield

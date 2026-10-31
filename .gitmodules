@@ -1,0 +1,5 @@
+[submodule "native/playback_capture/godot-cpp"]
+	path = native/playback_capture/godot-cpp
+	url = https://github.com/godotengine/godot-cpp.git
+	branch = master
+	ignore = untracked

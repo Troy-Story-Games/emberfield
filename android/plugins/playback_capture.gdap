@@ -1,0 +1,15 @@
+[config]
+
+name="PlaybackCapture"
+binary_type="local"
+binary="playback_capture/bin/playback_capture.aar"
+
+[dependencies]
+
+local=["playback_capture/bin/playback_capture.aar"]
+remote=[]
+custom_maven_repos=[]
+
+[plugins]
+
+PlaybackCapture="com.troystorygames.emberfield.playback.PlaybackCapturePlugin"

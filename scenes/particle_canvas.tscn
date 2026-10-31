@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://b70peqwcb3oxa"]
+
+[ext_resource type="Script" uid="uid://8eplk3masupc" path="res://scripts/particle_simulator.gd" id="1_sim"]
+[ext_resource type="Shader" uid="uid://bdyesve1ooqoi" path="res://shaders/composite.gdshader" id="2_comp"]
+[ext_resource type="Script" uid="uid://clp63du4kgkpq" path="res://scripts/lightning_layer.gd" id="3_bolt"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_composite"]
+shader = ExtResource("2_comp")
+shader_parameter/invert_amount = 0.0
+shader_parameter/bg_color = Color(0, 0, 0, 1)
+
+[node name="ParticleCanvas" type="Node" unique_id=1376113383]
+script = ExtResource("1_sim")
+trail_viewport_a_path = NodePath("TrailA")
+trail_viewport_b_path = NodePath("TrailB")
+particles_root_a_path = NodePath("TrailA/World")
+particles_root_b_path = NodePath("TrailB/World")
+composite_rect_path = NodePath("DisplayLayer/Composite")
+lightning_layer_path = NodePath("DisplayLayer/LightningLayer")
+
+[node name="TrailA" type="SubViewport" parent="." unique_id=1762682518]
+disable_3d = true
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1080, 1920)
+render_target_update_mode = 4
+
+[node name="World" type="Node2D" parent="TrailA" unique_id=834444290]
+
+[node name="TrailB" type="SubViewport" parent="." unique_id=1222582580]
+disable_3d = true
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1080, 1920)
+render_target_update_mode = 4
+
+[node name="World" type="Node2D" parent="TrailB" unique_id=239803774]
+
+[node name="DisplayLayer" type="CanvasLayer" parent="." unique_id=2127916564]
+layer = 0
+
+[node name="Composite" type="ColorRect" parent="DisplayLayer" unique_id=333485726]
+material = SubResource("ShaderMaterial_composite")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="DrawHead" type="MultiMeshInstance2D" parent="DisplayLayer"]
+z_index = 5
+visible = false
+
+[node name="LightningLayer" type="Node2D" parent="DisplayLayer" unique_id=1660579536]
+unique_name_in_owner = true
+z_index = 10
+script = ExtResource("3_bolt")
