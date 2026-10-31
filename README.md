@@ -15,9 +15,6 @@ Free and open source (MIT), with no ads, no trackers, no accounts and no network
 
 **Requires Godot 4.7+** (developed against 4.7.2).
 
-**Learn the foundations:** [docs/foundation-tutorial.md](docs/foundation-tutorial.md) covers MultiMesh particles, idle drift and Vortex.
-**Next:** [docs/glow-trails-tutorial.md](docs/glow-trails-tutorial.md) covers additive glow and ping-pong particle trails.
-
 ## Features
 
 - Fourteen art modes: Pulse, Vortex, Repel, Lightning, Flow, Black Hole, Sink, Beam, Orbit, Ripple, Magnet, Fluid, Fireworks, Audio
