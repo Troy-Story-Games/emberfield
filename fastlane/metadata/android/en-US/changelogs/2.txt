@@ -2,3 +2,4 @@ Bug fixes.
 
 - The microphone now starts listening right after you allow it, without switching Audio off and on
 - The grown-up check is now the same size as the settings panel on phones
+- Added index.md to docs for github pages
