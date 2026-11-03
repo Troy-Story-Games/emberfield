@@ -41,6 +41,9 @@ func begin_frame(anchor: Vector2, dt: float, positions: PackedVector2Array = Pac
         var near_frac := _near_fraction(positions, anchor)
         power *= lerpf(0.25, 1.0, near_frac)
         _explode_power = power
+        # A long, full hold earns a long, strong thump.
+        var punch := t * lerpf(0.4, 1.0, near_frac)
+        buzz(int(lerpf(30.0, 160.0, punch)), lerpf(0.35, 1.0, punch))
         _hold_time = 0.0
 
     if _explode_timer > 0.0:

@@ -48,6 +48,8 @@ func begin_frame(anchor: Vector2, dt: float, _positions: PackedVector2Array = Pa
         if _timer >= interval:
             _timer -= interval
             _bursts.append(anchor)
+    if not _bursts.is_empty():
+        buzz(int(lerpf(20.0, 45.0, clampf(_size / AppSettings.MAX_MUL, 0.0, 1.0))), 0.6)
 
 
 func apply_all(positions: PackedVector2Array, velocities: PackedVector2Array, anchor: Vector2, dt: float) -> void:

@@ -1,0 +1,5 @@
+Haptics and a settings fix.
+
+- New: Haptics. Your phone vibrates when a Black Hole explodes, Lightning strikes or a firework bursts, with light taps in Pulse and Ripple. Turn it off in Look
+- The tip at the bottom of the settings panel now clears when you switch tabs
+- New screenshots

@@ -14,6 +14,7 @@ const REPO_URL := "https://github.com/Troy-Story-Games/emberfield"
 const MENU_IDLE_FADE := 3.0
 const MENU_IDLE_ALPHA := 0.0
 const SAVE_DELAY := 0.6
+const HINT_IDLE := "Tap a control to read what it does."
 
 @onready var panel: PanelContainer = %Panel
 @onready var mode_option: OptionButton = %ModeOption
@@ -57,6 +58,7 @@ var _scrim: ColorRect
 var _hint: Label
 var _about_box: VBoxContainer
 var _reduce_flashing_check: CheckBox
+var _haptics_check: CheckBox
 var _gate: Control
 var _gate_center: CenterContainer
 var _gate_card: PanelContainer
@@ -376,6 +378,14 @@ func _build_reduce_flashing_row() -> void:
     var parent := glow_check.get_parent()
     parent.add_child(_reduce_flashing_check)
     parent.move_child(_reduce_flashing_check, glow_check.get_index() + 1)
+    _haptics_check = CheckBox.new()
+    _haptics_check.name = "HapticsCheck"
+    _haptics_check.text = "Haptics"
+    _haptics_check.toggled.connect(_on_haptics_toggled)
+    # Only phones vibrate; on desktop the row would do nothing.
+    _haptics_check.visible = OS.has_feature("mobile")
+    parent.add_child(_haptics_check)
+    parent.move_child(_haptics_check, _reduce_flashing_check.get_index() + 1)
 
 
 func _build_frame_rate_row() -> void:
@@ -976,6 +986,8 @@ func _split_settings_tabs() -> void:
     tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
     tabs.tab_alignment = TabBar.ALIGNMENT_CENTER
+    # A hint from another page would describe a control that is no longer on screen.
+    tabs.tab_changed.connect(func(_tab: int) -> void: _show_hint(HINT_IDLE))
     outer.add_child(tabs)
 
     var mode_box := _tab_page(tabs, "Mode")
@@ -994,7 +1006,7 @@ func _split_settings_tabs() -> void:
     _hint_label.custom_minimum_size = Vector2(0, 48)
     _hint_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
     _hint_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.72))
-    _hint_label.text = "Tap a control to read what it does."
+    _hint_label.text = HINT_IDLE
     outer.add_child(_hint_label)
 
     # Side by side, so the buttons take one row of the panel instead of two.
@@ -1250,6 +1262,8 @@ func _tip_for_title(title: String) -> String:
             return "Softens the particles with a glow."
         "Reduce flashing":
             return "Turns off the beat flash in Audio and the Lightning bolts."
+        "Haptics":
+            return "Vibrates on big moments, like a Black Hole explosion, a Lightning strike or a firework."
         "Show FPS":
             return "Shows the frame rate in the corner."
         "Idle":
@@ -1513,6 +1527,7 @@ func open() -> void:
         return
     panel.visible = true
     _scrim.visible = true
+    _show_hint(HINT_IDLE)
     _dismiss_hint()
     _wake_menu()
     _animate_panel(true)
@@ -1566,6 +1581,7 @@ func _sync_ui_from_settings() -> void:
     auto_check.button_pressed = settings.auto_control
     glow_check.button_pressed = settings.glow
     _reduce_flashing_check.button_pressed = settings.reduce_flashing
+    _haptics_check.button_pressed = settings.haptics
     fps_check.button_pressed = settings.show_fps
     _frame_rate.select(maxi(AppSettings.FRAME_RATES.find(settings.max_fps), 0))
     _sync_mode_grid()
@@ -1908,6 +1924,13 @@ func _on_reduce_flashing_toggled(pressed: bool) -> void:
     if _updating_ui:
         return
     settings.reduce_flashing = pressed
+    _emit_change()
+
+
+func _on_haptics_toggled(pressed: bool) -> void:
+    if _updating_ui:
+        return
+    settings.haptics = pressed
     _emit_change()
 
 

@@ -46,6 +46,7 @@ func begin_frame(anchor: Vector2, _dt: float, _positions: PackedVector2Array = P
     if just_pressed:
         _do_pulse = true
         _stream_started = false
+        buzz(18, 0.4)
     elif touch_active:
         _do_pulse = false
         _stream_started = true

@@ -195,6 +195,8 @@ var auto_control: bool = false
 var glow: bool = true
 ## Drops the Audio beat flash and the Lightning bolts, for photosensitive viewers.
 var reduce_flashing: bool = false
+## Short vibrations on big moments (Black Hole explode, Lightning strike, Fireworks burst...).
+var haptics: bool = true
 var show_fps: bool = false
 var max_fps: int = DEFAULT_MAX_FPS
 var hint_shown: bool = false
@@ -288,6 +290,7 @@ func load_from_disk() -> void:
     auto_control = bool(cfg.get_value(SECTION, "auto_control", false))
     glow = bool(cfg.get_value(SECTION, "glow", true))
     reduce_flashing = bool(cfg.get_value(SECTION, "reduce_flashing", false))
+    haptics = bool(cfg.get_value(SECTION, "haptics", true))
     show_fps = bool(cfg.get_value(SECTION, "show_fps", false))
     max_fps = int(cfg.get_value(SECTION, "max_fps", DEFAULT_MAX_FPS))
     if not FRAME_RATES.has(max_fps):
@@ -365,6 +368,7 @@ func reset_to_defaults() -> void:
     auto_control = false
     glow = true
     reduce_flashing = false
+    haptics = true
     show_fps = false
     max_fps = DEFAULT_MAX_FPS
     color_preset = ColorPreset.FIRE
@@ -441,6 +445,7 @@ func save_to_disk() -> void:
     cfg.set_value(SECTION, "auto_control", auto_control)
     cfg.set_value(SECTION, "glow", glow)
     cfg.set_value(SECTION, "reduce_flashing", reduce_flashing)
+    cfg.set_value(SECTION, "haptics", haptics)
     cfg.set_value(SECTION, "show_fps", show_fps)
     cfg.set_value(SECTION, "max_fps", max_fps)
     cfg.set_value(SECTION, "hint_shown", hint_shown)

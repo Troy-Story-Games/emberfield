@@ -27,6 +27,7 @@ Free and open source (MIT), with no ads, no trackers, no accounts and no network
 - Auto control: screensaver-style roaming with occasional mode changes (it never picks Audio, so no capture prompt appears on a timer)
 - Frame rate cap (30, 60 or unlimited) for battery life on high-refresh phones
 - Reduce flashing: turns off the Audio beat flash and the Lightning bolts
+- Haptics (phones, on by default): short vibrations for Black Hole explosions, Lightning strikes, Fireworks bursts, and Pulse and Ripple taps. Auto Control never vibrates
 - Grown-up check (a math question) before choosing Playback or opening the source link, so the app is safe to hand to young kids
 - Flow follows accelerometer tilt on phones
 - Settings persisted to `user://settings.cfg`
@@ -91,7 +92,7 @@ $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
 1. In Godot: **Editor → Editor Settings → Export → Android**, set SDK/JDK paths and debug keystore (or create one).
 2. Install Android Build Template if prompted (**Project → Install Android Build Template**).
 3. Build the playback AAR if it is not already in `android/plugins/playback_capture/bin/` (see above). The export does this itself when the file is missing.
-4. Allow `RECORD_AUDIO` and `POST_NOTIFICATIONS`. The plugin manifest also adds `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MEDIA_PROJECTION`. The **PlaybackCapture** editor plugin (already enabled) packages the AAR.
+4. Allow `RECORD_AUDIO`, `POST_NOTIFICATIONS` and `VIBRATE` (Haptics). The plugin manifest also adds `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MEDIA_PROJECTION`. The **PlaybackCapture** editor plugin (already enabled) packages the AAR.
 5. **Project → Export → Android → Export Project**
 
 The app targets API 36 and supports API 24+. Playback capture needs Android 10 (API 29); Microphone mode works on every supported version.
@@ -127,8 +128,11 @@ Scripts in [`tools/`](tools) are excluded from exports.
 |---------|--------------|
 | `godot --headless --path . -s res://tools/bench.gd` | Frame time for every mode and audio style at 5k and 12k particles |
 | `godot --headless --path . -s res://tools/settings_fit.gd` | Checks every settings page fits a 1080x1920 phone without scrolling; exits 1 if one overflows |
-| `godot --path . -s res://tools/screenshot.gd -- --out=<path> --mode=<n> [--panel]` | Scripted drag, then screenshots |
-| `godot --path . -s res://tools/audio_demo.gd -- --out=<path> --style=<n>` | Plays a synthetic track into the muted analyzer and screenshots an Audio style |
+| `godot --path . -s res://tools/screenshot.gd -- --out=<path> --mode=<n> [--panel] [--size=1080x1920] [--ui-scale=1.5] [--set=key=value]` | Scripted drag, then screenshots. `--set` overrides any setting (`--set=color_preset=3 --set=width=700`) |
+| `godot --path . -s res://tools/audio_demo.gd -- --out=<path> --style=<n> [--size=1080x1920] [--set=key=value]` | Plays a synthetic track into the muted analyzer and screenshots an Audio style |
+| `python tools/trailer_music.py music.wav [--along]` | Synthesizes the trailer's original soundtrack (needs numpy and scipy). `--along` keeps the groove going under the touch-instrument section |
+| `godot --path . --write-movie <dir>/frame.png --fixed-fps 30 -s res://tools/trailer.gd -- --music=music.wav [--along]` | Records the scripted trailer session with Movie Maker. `--along` plays a square-wave melody along with the `--along` track |
+| `python tools/make_trailer.py <dir> trailer.mp4` | Composes the 1920x1080 store trailer from those frames (needs ffmpeg and Pillow) |
 | `python tools/make_icon.py`, then `godot --headless --path . -s res://tools/make_icons.gd` | Regenerates the icon SVGs and the Android and store PNGs |
 
 ## License

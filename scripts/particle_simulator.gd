@@ -388,6 +388,7 @@ func _simulate(dt: float) -> void:
     mode.just_pressed = just_p
     mode.just_released = just_r
     mode.touch_velocity = tvel
+    mode.user_touch = user_active or (touch != null and touch.just_released)
     mode.begin_idle_frame(dt, velocities, positions)
     mode.begin_frame(anchor, dt, positions)
 

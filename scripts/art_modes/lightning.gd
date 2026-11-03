@@ -40,6 +40,7 @@ func begin_frame(anchor: Vector2, dt: float, _positions: PackedVector2Array = Pa
             _pending_discharge = true
             _discharge_center = anchor
             _charge = 0.0
+            buzz(40, 0.8)
     else:
         _charge = maxf(0.0, _charge - dt * 0.5)
 

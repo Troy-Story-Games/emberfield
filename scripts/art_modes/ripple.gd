@@ -31,6 +31,7 @@ func begin_frame(anchor: Vector2, dt: float, _positions: PackedVector2Array = Pa
     if just_pressed:
         _spawn_timer = 0.0
         _add_ring(anchor)
+        buzz(15, 0.3)
 
     if touch_active:
         _spawn_timer += dt

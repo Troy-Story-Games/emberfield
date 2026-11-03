@@ -15,13 +15,19 @@ const IDLE_BOIDS_SEP_DIST := 55.0
 const IDLE_BOIDS_WANDER := 0.35
 const IDLE_RAIN := 220.0
 const IDLE_RAIN_JITTER := 40.0
+## Buzzes closer together than this are dropped, so held effects don't drone.
+const BUZZ_GAP_MS := 90
 
 var bounds: Rect2 = Rect2(0, 0, 1080, 1920)
 var touch_active: bool = false
 var just_pressed: bool = false
 var just_released: bool = false
 var touch_velocity: Vector2 = Vector2.ZERO
+## True when a real finger drives this frame (not Auto Control), so haptics only answer touches.
+var user_touch: bool = false
 var settings: AppSettings
+
+static var _last_buzz_ms: int = -BUZZ_GAP_MS
 
 var _idle_time: float = 0.0
 var _idle_velocities: PackedVector2Array = PackedVector2Array()
@@ -35,6 +41,17 @@ func setup(viewport_size: Vector2) -> void:
 
 func bind_settings(s: AppSettings) -> void:
     settings = s
+
+
+## Short vibration for a big moment. Skipped when Haptics is off or nobody is touching.
+func buzz(duration_ms: int, amplitude: float) -> void:
+    if not user_touch or settings == null or not settings.haptics:
+        return
+    var now := Time.get_ticks_msec()
+    if now - _last_buzz_ms < BUZZ_GAP_MS:
+        return
+    _last_buzz_ms = now
+    Input.vibrate_handheld(duration_ms, clampf(amplitude, 0.05, 1.0))
 
 
 func begin_idle_frame(
