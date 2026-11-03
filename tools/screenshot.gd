@@ -1,7 +1,10 @@
 extends SceneTree
 ## Renders the main scene with a scripted drag and saves screenshots (needs a GPU window).
-## Godot --path . --resolution 540x960 -s res://tools/screenshot.gd -- --out=C:/tmp/shot --mode=0 [--style=0] [--panel] [--tab=0] [--taps]
+## Godot --path . -s res://tools/screenshot.gd -- --out=C:/tmp/shot --mode=0 [--size=1080x1920] [--ui-scale=2.0] [--style=0] [--panel] [--tab=0] [--taps] [--set=key=value ...]
 ## --taps replaces the drag with a series of short taps around the screen (for Fireworks).
+## --set overrides any AppSettings field, e.g. --set=color_preset=1 --set=particle_count=12000 --set=length=0.9
+## --size=1080x1920 un-maximizes the window and moves it to a screen tall enough to hold that size.
+## --ui-scale=2.0 draws the menu and settings panel at a phone's UI scale (desktop uses 1.0).
 
 var _out: String = "user://shot"
 var _mode: int = -1
@@ -9,6 +12,9 @@ var _style: int = -1
 var _panel: bool = false
 var _tab: int = 0
 var _taps: bool = false
+var _overrides: Dictionary = {}
+var _size: Vector2i = Vector2i.ZERO
+var _ui_scale: float = 0.0
 var _frame: int = 0
 var _main: Node
 
@@ -27,12 +33,22 @@ func _initialize() -> void:
             _taps = true
         elif arg.begins_with("--tab="):
             _tab = int(arg.trim_prefix("--tab="))
+        elif arg.begins_with("--size="):
+            var wh := arg.trim_prefix("--size=").split("x")
+            _size = Vector2i(int(wh[0]), int(wh[1]))
+        elif arg.begins_with("--ui-scale="):
+            _ui_scale = float(arg.trim_prefix("--ui-scale="))
+        elif arg.begins_with("--set="):
+            var kv := arg.trim_prefix("--set=").split("=", true, 1)
+            _overrides[kv[0]] = str_to_var(kv[1])
     _main = (load("res://scenes/main.tscn") as PackedScene).instantiate()
     root.add_child(_main)
 
 
 func _process(_delta: float) -> bool:
     _frame += 1
+    if _frame == 1 and _size != Vector2i.ZERO:
+        fit_window(root, _size)
     var size := root.get_visible_rect().size
     if _frame == 2:
         var s: AppSettings = _main.get("settings")
@@ -40,7 +56,11 @@ func _process(_delta: float) -> bool:
             s.art_mode = _mode as AppSettings.ArtMode
         if _style >= 0:
             s.audio_style = _style as AppSettings.AudioStyle
+        for key in _overrides:
+            s.set(key, _overrides[key])
         s.hint_shown = true
+        if _ui_scale > 0.0:
+            set_ui_scale(_main.get_node("%SettingsPanel"), _ui_scale)
         _main.get_node("%SettingsPanel").call("bind_settings", s)
         _main.get_node("%SettingsPanel").call("_dismiss_hint")
         _main.get_node("%ParticleSimulator").call("apply_settings", s)
@@ -75,6 +95,21 @@ func _process(_delta: float) -> bool:
         _save(_out + "_panel.png")
         return true
     return false
+
+
+static func set_ui_scale(panel: Node, ui_scale: float) -> void:
+    panel.set("_ui_scale", ui_scale)
+    panel.call("_apply_ui_scale_to_controls")
+
+
+static func fit_window(win: Window, size: Vector2i) -> void:
+    win.mode = Window.MODE_WINDOWED
+    win.size = size
+    for screen in DisplayServer.get_screen_count():
+        var area := DisplayServer.screen_get_usable_rect(screen)
+        if area.size.x >= size.x and area.size.y >= size.y:
+            win.position = area.position + (area.size - size) / 2
+            return
 
 
 func _touch(p: Vector2, pressed: bool) -> void:

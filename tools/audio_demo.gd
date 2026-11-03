@@ -1,7 +1,7 @@
 extends SceneTree
 ## Plays a synthetic 120 BPM track into the muted Analyze bus and screenshots an Audio style.
 ## Needs a real audio driver and GPU window (not --headless). Nothing is audible: the bus is muted.
-## Godot --path . -s res://tools/audio_demo.gd -- --out=C:/tmp/eq --style=1 [--shots=3]
+## Godot --path . -s res://tools/audio_demo.gd -- --out=C:/tmp/eq --style=1 [--shots=3] [--size=1080x1920] [--set=key=value ...]
 
 const RATE := 44100.0
 const BPM := 120.0
@@ -9,6 +9,8 @@ const BPM := 120.0
 var _out: String = "user://audio"
 var _style: int = 0
 var _shots: int = 3
+var _overrides: Dictionary = {}
+var _size: Vector2i = Vector2i.ZERO
 var _frame: int = 0
 var _main: Node
 var _gen: AudioStreamGeneratorPlayback
@@ -26,18 +28,28 @@ func _initialize() -> void:
             _style = int(arg.trim_prefix("--style="))
         elif arg.begins_with("--shots="):
             _shots = int(arg.trim_prefix("--shots="))
+        elif arg.begins_with("--size="):
+            var wh := arg.trim_prefix("--size=").split("x")
+            _size = Vector2i(int(wh[0]), int(wh[1]))
+        elif arg.begins_with("--set="):
+            var kv := arg.trim_prefix("--set=").split("=", true, 1)
+            _overrides[kv[0]] = str_to_var(kv[1])
     _main = (load("res://scenes/main.tscn") as PackedScene).instantiate()
     root.add_child(_main)
 
 
 func _process(_delta: float) -> bool:
     _frame += 1
+    if _frame == 1 and _size != Vector2i.ZERO:
+        load("res://tools/screenshot.gd").fit_window(root, _size)
     if _frame == 2:
         var s: AppSettings = _main.get("settings")
         s.art_mode = AppSettings.ArtMode.AUDIO
         s.audio_style = _style as AppSettings.AudioStyle
         s.audio_style_auto = false
         s.audio_source = AppSettings.AudioSource.MICROPHONE
+        for key in _overrides:
+            s.set(key, _overrides[key])
         s.hint_shown = true
         _main.get_node("%SettingsPanel").call("bind_settings", s)
         _main.get_node("%SettingsPanel").call("_dismiss_hint")

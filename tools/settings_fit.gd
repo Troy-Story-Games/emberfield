@@ -38,6 +38,8 @@ func _process(_delta: float) -> bool:
     _frame += 1
     if _frame == 2:
         _panel.set("_ui_scale", _scale)
+        # Phone-only rows are hidden on desktop; show them so the check measures a phone.
+        (_panel.find_child("HapticsCheck", true, false) as Control).visible = true
         _panel.call("open")
     # The headless window is tiny, so size the panel for the phone screen every frame
     # (the panel refits itself to the real window on resize). Layout is in unscaled
